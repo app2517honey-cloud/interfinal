@@ -709,6 +709,7 @@ body {
     };
 
     const callGeminiAPI = async (apiKey, context) => {
+        // Upgraded to 3.5 Flash Model!
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
         
         const response = await fetch(url, {
@@ -718,18 +719,19 @@ body {
                 contents: [{
                     role: "user",
                     parts: [{
-                        text: `You are an expert interview assistant providing live help to a candidate.\n\nThe following is a live transcript of the interview so far:\n"${context}"\n\nIdentify the most recent question asked by the interviewer, and provide a short, concise, and excellent suggested answer or talking points for the candidate.`
+                        // Upgraded Prompt with Auto-Correction!
+                        text: `You are an expert interview assistant providing live help to a candidate.\n\nThe following is a live transcript of the interview. IT CONTAINS HEAVY SPEECH-TO-TEXT TYPOS AND ERRORS. Please auto-correct the scrambled words using context clues, identify the most recent question asked by the interviewer, and provide a short, concise, and excellent suggested answer or talking points for the candidate.\n\nTranscript:\n"${context}"`
                     }]
                 }]
             })
         });
-
         const data = await response.json();
         if (!response.ok) {
             throw new Error(`Gemini API Error: ${data.error?.message || response.statusText || 'Unknown Error'}`);
         }
         
         return data.candidates[0].content.parts[0].text;
+    };
     };
 
     const callOpenAIAPI = async (apiKey, context) => {
